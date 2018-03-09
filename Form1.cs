@@ -39,111 +39,9 @@ namespace myPlayer
                 //играть
         private  void button1_Click(object sender, EventArgs e)
         {
-            
-         
-                if (pause) //если пауза
-        {
-            pause = false;
-            Bass.BASS_Free();
-            listBox1.SelectedItem = listBox1.Items[i];
-            Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_SPEAKERS, IntPtr.Zero); 
-            Bass.BASS_Start();
-            Single level = 1;
-            level = trackBar2.Value;
-            Bass.BASS_SetVolume(level / 100);
-            Player.stream = Bass.BASS_StreamCreateFile(fplaylist[i], 0, 0, BASSFlag.BASS_DEFAULT);
-            Bass.BASS_ChannelPlay(Player.stream, false);
-            Bass.BASS_ChannelSetPosition(Player.stream, pauseposition);
-            time = pauseposition;
-            timer1.Start();
-        }   //если нет
-        else {
-            if (fplaylist.Count > 0)// мелодии есть нет
-                  {
-                      if (automode) //автоматический режим
-                      {
-                          Bass.BASS_Free();
-                          Random r = new Random();
-                          i = r.Next(fplaylist.Count);
-                          listBox1.SelectedItem = listBox1.Items[i];
-                          nomertreka++;
-                          porjadokplay.Add(i);
-                          time =0;
-                          timer1.Enabled = true;
-                          timer1.Start();
-                          timer1.Interval = 1000; 
-                           Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_SPEAKERS, IntPtr.Zero);
-                          Single level = 1;
-                          level = trackBar2.Value;
-                          Bass.BASS_SetVolume(level / 100);
-                          Player.stream = Bass.BASS_StreamCreateFile(fplaylist[i], 0, 0, BASSFlag.BASS_DEFAULT);
-                          timetrek = Bass.BASS_ChannelBytes2Seconds(Player.stream, Bass.BASS_ChannelGetLength(Player.stream));
-                          trackBar1.Maximum = (int)timetrek;
-                          trackBar1.Minimum = 0;
-                          trackBar1.TickFrequency = 1;
-                          vremya(timetrek);
-                          label3.Text = "Продолжительность трека" + " " + prodoljit;
-                          Bass.BASS_ChannelPlay(Player.stream, false);
-                          label2.Text = listBox1.Items[i].ToString();
-                      }
-                      else //ручной
-                      {
-                          if (porjadok)
-                          {
-                              if (i == fplaylist.Count - 1)
-                              {
-                                  i = 0;
-                              }
-                              else {i++; }
-                              Bass.BASS_Free();
-                              listBox1.SelectedItem = listBox1.Items[i];
-                              nomertreka++;
-                              porjadokplay.Add(i);
-                              time = 0;
-                              timer1.Enabled = true;
-                              timer1.Start();
-                              timer1.Interval = 1000;
-                              Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_SPEAKERS, IntPtr.Zero);
-                              Single level = 1;
-                              level = trackBar2.Value;
-                              Bass.BASS_SetVolume(level / 100);
-                              Player.stream = Bass.BASS_StreamCreateFile(fplaylist[i], 0, 0, BASSFlag.BASS_DEFAULT);
-                              timetrek = Bass.BASS_ChannelBytes2Seconds(Player.stream, Bass.BASS_ChannelGetLength(Player.stream));
-                              trackBar1.Maximum = (int)timetrek;
-                              trackBar1.Minimum = 0;
-                              trackBar1.TickFrequency = 1;
-                              vremya(timetrek);
-                              label3.Text = "Продолжительность трека" + " " + prodoljit;
-                              Bass.BASS_ChannelPlay(Player.stream, false);
-                              label2.Text = listBox1.Items[i].ToString();
-                          }
-                          if((!automode)&&(!porjadok)) { 
-                           time = 0;
-                          timer1.Start();
-                          Bass.BASS_Free();
-                          Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_SPEAKERS, IntPtr.Zero);
-                          Single level = 1;
-                          level = trackBar2.Value;
-                          Bass.BASS_SetVolume(level / 100);
-                          i = listBox1.SelectedIndex;
-                          nomertreka++;
-                          porjadokplay.Add(i);
-                          if ((fplaylist.Count > 0) && (i >= 0))
-                          {
-                              Player.stream = Bass.BASS_StreamCreateFile(fplaylist[i], 0, 0, BASSFlag.BASS_DEFAULT);
-                              timetrek = Bass.BASS_ChannelBytes2Seconds(Player.stream, Bass.BASS_ChannelGetLength(Player.stream));
-                              trackBar1.Maximum = (int)timetrek;
-                              trackBar1.Minimum = 0;
-                              trackBar1.TickFrequency = 1;
-                              vremya(timetrek);
-                              label3.Text = "Продолжительность трека" + " " + prodoljit;
-                              Bass.BASS_ChannelPlay(Player.stream, false);
-                              label2.Text = listBox1.Items[i].ToString();
-                          }
-                          }
-                      }
-                  }
-            } }
+
+            autoplay();
+                 }
         
         //стоп
         private void button2_Click(object sender, EventArgs e)
@@ -321,7 +219,7 @@ namespace myPlayer
                 label5.Text =vremya(time);
             }
            if ((time>=timetrek)&&((automode)||(porjadok))){
-               button1.PerformClick(); //вызов принудительного нажатия кнопки по завершению композиции.
+               autoplay(); //вызов принудительного нажатия кнопки по завершению композиции.
                if ((!automode)&&(!porjadok)) {timer1.Stop();}
            }
         }
@@ -517,14 +415,117 @@ namespace myPlayer
                time = 0;
                }
            }
+           void autoplay()
+           {
+               if (pause) //если пауза
+               {
+                   pause = false;
+                   Bass.BASS_Free();
+                   listBox1.SelectedItem = listBox1.Items[i];
+                   Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_SPEAKERS, IntPtr.Zero);
+                   Bass.BASS_Start();
+                   Single level = 1;
+                   level = trackBar2.Value;
+                   Bass.BASS_SetVolume(level / 100);
+                   Player.stream = Bass.BASS_StreamCreateFile(fplaylist[i], 0, 0, BASSFlag.BASS_DEFAULT);
+                   Bass.BASS_ChannelPlay(Player.stream, false);
+                   Bass.BASS_ChannelSetPosition(Player.stream, pauseposition);
+                   time = pauseposition;
+                   timer1.Start();
+               }   //если нет
+               else
+               {
+                   if (fplaylist.Count > 0)// мелодии есть нет
+                   {
+                       if (automode) //автоматический режим
+                       {
+                           Bass.BASS_Free();
+                           Random r = new Random();
+                           i = r.Next(fplaylist.Count);
+                           listBox1.SelectedItem = listBox1.Items[i];
+                           nomertreka++;
+                           porjadokplay.Add(i);
+                           time = 0;
+                           timer1.Enabled = true;
+                           timer1.Start();
+                           timer1.Interval = 1000;
+                           Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_SPEAKERS, IntPtr.Zero);
+                           Single level = 1;
+                           level = trackBar2.Value;
+                           Bass.BASS_SetVolume(level / 100);
+                           Player.stream = Bass.BASS_StreamCreateFile(fplaylist[i], 0, 0, BASSFlag.BASS_DEFAULT);
+                           timetrek = Bass.BASS_ChannelBytes2Seconds(Player.stream, Bass.BASS_ChannelGetLength(Player.stream));
+                           trackBar1.Maximum = (int)timetrek;
+                           trackBar1.Minimum = 0;
+                           trackBar1.TickFrequency = 1;
+                           vremya(timetrek);
+                           label3.Text = "Продолжительность трека" + " " + prodoljit;
+                           Bass.BASS_ChannelPlay(Player.stream, false);
+                           label2.Text = listBox1.Items[i].ToString();
+                       }
+                       else //ручной
+                       {
+                           if (porjadok)
+                           {
+                               if (i == fplaylist.Count - 1)
+                               {
+                                   i = 0;
+                               }
+                               else { i++; }
+                               Bass.BASS_Free();
+                               listBox1.SelectedItem = listBox1.Items[i];
+                               nomertreka++;
+                               porjadokplay.Add(i);
+                               time = 0;
+                               timer1.Enabled = true;
+                               timer1.Start();
+                               timer1.Interval = 1000;
+                               Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_SPEAKERS, IntPtr.Zero);
+                               Single level = 1;
+                               level = trackBar2.Value;
+                               Bass.BASS_SetVolume(level / 100);
+                               Player.stream = Bass.BASS_StreamCreateFile(fplaylist[i], 0, 0, BASSFlag.BASS_DEFAULT);
+                               timetrek = Bass.BASS_ChannelBytes2Seconds(Player.stream, Bass.BASS_ChannelGetLength(Player.stream));
+                               trackBar1.Maximum = (int)timetrek;
+                               trackBar1.Minimum = 0;
+                               trackBar1.TickFrequency = 1;
+                               vremya(timetrek);
+                               label3.Text = "Продолжительность трека" + " " + prodoljit;
+                               Bass.BASS_ChannelPlay(Player.stream, false);
+                               label2.Text = listBox1.Items[i].ToString();
+                           }
+                           if ((!automode) && (!porjadok))
+                           {
+                               time = 0;
+                               timer1.Start();
+                               Bass.BASS_Free();
+                               Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_SPEAKERS, IntPtr.Zero);
+                               Single level = 1;
+                               level = trackBar2.Value;
+                               Bass.BASS_SetVolume(level / 100);
+                               i = listBox1.SelectedIndex;
+                               nomertreka++;
+                               porjadokplay.Add(i);
+                               if ((fplaylist.Count > 0) && (i >= 0))
+                               {
+                                   Player.stream = Bass.BASS_StreamCreateFile(fplaylist[i], 0, 0, BASSFlag.BASS_DEFAULT);
+                                   timetrek = Bass.BASS_ChannelBytes2Seconds(Player.stream, Bass.BASS_ChannelGetLength(Player.stream));
+                                   trackBar1.Maximum = (int)timetrek;
+                                   trackBar1.Minimum = 0;
+                                   trackBar1.TickFrequency = 1;
+                                   vremya(timetrek);
+                                   label3.Text = "Продолжительность трека" + " " + prodoljit;
+                                   Bass.BASS_ChannelPlay(Player.stream, false);
+                                   label2.Text = listBox1.Items[i].ToString();
+                               }
+                           }
+                       }
+                   }
+               }
+           }
     }
      abstract class Player {
         static public int stream;
        static public int[] p = new int[10];
        static public BASS_DX8_PARAMEQ ek = new BASS_DX8_PARAMEQ();
     } }
-
- 
-  
-    
- 
